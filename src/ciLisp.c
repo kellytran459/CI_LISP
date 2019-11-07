@@ -134,12 +134,15 @@ RET_VAL eval(AST_NODE *node)
     // Use the results of those calls to populate result.
     switch (node->type)
     {
+        case FUNC_NODE_TYPE:
+            evalFuncNode( &node->data.function);
+            break;
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");
     }
 
     return result;
-}  
+}
 
 // returns a pointer to the NUM_AST_NODE (aka RET_VAL) referenced by node.
 // DOES NOT allocate space for a new RET_VAL.
@@ -168,7 +171,16 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     // TODO populate result with the result of running the function on its operands.
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
 
+    RET_VAL op1;
+    RET_VAL op2;
 
+    switch (funcNode->oper)
+    {
+        case ADD_OPER:
+            op1 = eval(funcNode->op1); //ryan's code
+            op2 = eval(funcNode->op2);
+            break;
+    }
     return result;
 }
 
