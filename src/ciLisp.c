@@ -83,7 +83,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     if ((node = calloc(nodeSize, 1)) == NULL)
         yyerror("Memory allocation failed!");
 
-    // TODO set the AST_NODE's type, populate contained FUNC_AST_NODE
+    // TODO set the AST_NODE's type, populate contained FUNC_AST_NODE TEST
     // NOTE: you do not need to populate the "ident" field unless the function is type CUSTOM_OPER.
     // When you do have a CUSTOM_OPER, you do NOT need to allocate and strcpy here.
     // The funcName will be a string identifier for which space should be allocated in the tokenizer.
