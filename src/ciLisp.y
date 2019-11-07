@@ -26,7 +26,13 @@ program:
     };
 
 s_expr:
-    number {
+    SYMBOL{
+    $$ = createSymbolNode($1)
+    }
+    | LPAREN let_section s_expr RPAREN {
+    $$ = linkSymbolTable($2, $3);
+    }
+    | number {
         fprintf(stderr, "yacc: s_expr ::= number\n");
         $$ = $1;
     }
