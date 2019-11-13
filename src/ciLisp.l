@@ -8,21 +8,21 @@
 
 digit [0-9]
 int [+-]?{digit}+
-double [+-]?{digit}+\.{digit}*
+double {int}\.{digit}*
 func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"exp2"|"cbrt"|"hypot"
 
 %%
-
-{int} {
-    yylval.dval = strtod(yytext, NULL);
-    fprintf(stderr, "lex: INT dval = %lf\n", yylval.dval);
-    return INT;
-}
 
 {double} {
     yylval.dval = strtod(yytext, NULL);
     fprintf(stderr, "lex: DOUBLE dval = %lf\n", yylval.dval);
     return DOUBLE;
+}
+
+{int} {
+    yylval.dval = strtod(yytext, NULL);
+    fprintf(stderr, "lex: INT dval = %lf\n", yylval.dval);
+    return INT;
 }
 
 "quit" {

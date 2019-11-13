@@ -183,7 +183,7 @@ RET_VAL evalNumNode(NUM_AST_NODE *numNode)
     // SEE: AST_NODE, AST_NODE_TYPE, NUM_AST_NODE
     // assign result.value to be equal to numNode.value and thereforth
     result.value = numNode->value;
-    result.type = result.type;
+    result.type = numNode->type;
 
     return result;
 }
@@ -207,7 +207,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     {
         result.type = DOUBLE_TYPE;
     }
-    result.type = DOUBLE_TYPE;
+    //result.type = DOUBLE_TYPE;
     switch (funcNode->oper)
     {
         case ADD_OPER:
@@ -291,7 +291,7 @@ void printRetVal(RET_VAL val)
     if(val.type == INT_TYPE)
     {
         printf("Type: int\n");
-        printf("%f",val.value);
+        printf("%d",(int)val.value);
     }
     else
     {
