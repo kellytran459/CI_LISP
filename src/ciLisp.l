@@ -8,7 +8,7 @@
 
 digit [0-9]
 int [+-]?{digit}+
-double [+-]?{digit}\.{digit}*
+double [+-]?{digit}+\.{digit}*
 func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"exp2"|"cbrt"|"hypot"
 
 %%
@@ -52,7 +52,7 @@ func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"
     return EOL;
     }
 
-[ |\t] ; /* skip whitespace */
+[ \t] ; /* skip whitespace */
 
 . { // anything else
     printf("ERROR: invalid character: >>%s<<\n", yytext);
@@ -65,7 +65,7 @@ func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"
  */
 int main(void) {
 
-    //   freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
+       freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
 
     char *s_expr_str = NULL;
     size_t s_expr_str_len = 0;
