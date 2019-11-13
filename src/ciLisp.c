@@ -106,6 +106,14 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     node->data.function.op1 = op1;
     node->data.function.op2 = op2;
     node->data.function.ident = funcName;
+
+    //Adding parantage to op1 and op2
+    //  Because op2 can be null, needs special check (NULL POINTER EXCEPTION)
+    //  Functions are the only place that cause parantage
+    node->data.function.op1->parent = node;
+    if (op2 != NULL) {
+        node->data.function.op2->parent = node;
+    }
     // check that operand != CUSTOM_OPER bhen you free
     free(funcName);
     eval(node);
