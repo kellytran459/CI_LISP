@@ -107,6 +107,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2);
 AST_NODE *createSymbolNode(char *symbolName);
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_section, AST_NODE *s_expr);
+AST_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem);
 
 void freeNode(AST_NODE *node);
 

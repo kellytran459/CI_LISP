@@ -65,7 +65,7 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
     node->type=NUM_NODE_TYPE;
     node->data.number = malloc(sizeof(NUM_AST_NODE));
     node->data.number->type = type;
-    node->data.number->value = value;
+    node->data.number.value = value;
 
     eval(node);
 
