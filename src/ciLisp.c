@@ -34,18 +34,6 @@ char *funcNames[] = {
         ""
 };
 
-OPER_TYPE resolveFunc(char *funcName)
-{
-    int i = 0;
-    while (funcNames[i][0] != '\0')
-    {
-        if (strcmp(funcNames[i], funcName) == 0)
-            return i;
-        i++;
-    }
-    return CUSTOM_OPER;
-}
-
 // Called when an INT or DOUBLE token is encountered (see ciLisp.l and ciLisp.y).
 // Creates an AST_NODE for the number.
 // Sets the AST_NODE's type to number.
@@ -63,8 +51,8 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
 
     // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE
     node->type=NUM_NODE_TYPE;
-    node->data.number = malloc(sizeof(NUM_AST_NODE));
-    node->data.number->type = type;
+    //node->data.number = malloc(sizeof(NUM_AST_NODE));
+    node->data.number.type = type;
     node->data.number.value = value;
 
     eval(node);
@@ -121,10 +109,62 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     return node;
 }
 
+//TODO: create SymbolNode
+AST_NODE *createSymbolNode(char *symbolName)
+{
+//    AST_NODE *node;
+//    size_t nodeSize;
+//
+//    nodeSize = sizeof(AST_NODE);
+//    if ((node = calloc(nodeSize, 1)) == NULL)
+//        yyerror("Memory allocation failed!");
+//
+//    node->symbolTable->ident = malloc(nodeSize);
+//    strcpy(node->symbolTable->ident, symbolName);
+//
+//    node->symbolTable->val = s_expr;
+//    node->symbolTable->next = NULL;
+}
+
+AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_section, AST_NODE *s_expr)
+{
+    s_expr->symbolTable = let_section;
+    return s_expr;
+}
+
+SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem)
+{
+    AST_NODE node;
+
+}
+
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr)
+{
+
+}
+
+
+OPER_TYPE resolveFunc(char *funcName)
+{
+    int i = 0;
+    while (funcNames[i][0] != '\0')
+    {
+        if (strcmp(funcNames[i], funcName) == 0)
+            return i;
+        i++;
+    }
+    return CUSTOM_OPER;
+}
+
+
+
 // Called after execution is done on the base of the tree.
 // (see the program production in ciLisp.y)
 // Recursively frees the whole abstract syntax tree.
 // You'll need to update and expand freeNode as the project develops.
+
+
+
 void freeNode(AST_NODE *node)
 {
     if (!node)
@@ -167,7 +207,7 @@ RET_VAL eval(AST_NODE *node)
             break;
         case NUM_NODE_TYPE:
             //evalNumNode(node.data.number)
-            result = evalNumNode(node->data.number);
+            result = evalNumNode(&node->data.number);
             break;
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");

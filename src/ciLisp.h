@@ -1,3 +1,4 @@
+
 #ifndef __cilisp_h_
 #define __cilisp_h_
 
@@ -62,14 +63,14 @@ typedef enum {
 
 typedef struct symbol_table_node {
     char *ident;
-    struct ast_node *val;
+    struct ast_node val;
     struct symbol_table_node *next;
 } SYMBOL_TABLE_NODE;
 
 // Node to store a number.
 typedef struct {
     NUM_TYPE type;
-        double value;
+    double value;
 } NUM_AST_NODE;
 
 // Values returned by eval function will be numbers with a type.
@@ -107,7 +108,9 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2);
 AST_NODE *createSymbolNode(char *symbolName);
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_section, AST_NODE *s_expr);
-AST_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem);
+SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem);
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr);
+
 
 void freeNode(AST_NODE *node);
 

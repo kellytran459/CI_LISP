@@ -14,7 +14,7 @@
 %token LPAREN RPAREN EOL QUIT LET
 
 %type <astNode> s_expr f_expr number symbol
-%type <symAstNode> let_elem let_section let_list
+%type <symAstNode> let_list let_elem let_section
 %%
 
 program:
@@ -101,4 +101,3 @@ f_expr:
         $$ = createFunctionNode($2, $3, $4);
     };
 %%
-
