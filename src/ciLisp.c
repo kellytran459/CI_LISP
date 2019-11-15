@@ -49,7 +49,7 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
     if ((node = calloc(nodeSize, 1)) == NULL)
         yyerror("Memory allocation failed!");
 
-    // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE
+    // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE - done
     node->type=NUM_NODE_TYPE;
     //node->data.number = malloc(sizeof(NUM_AST_NODE));
     node->data.number.type = type;
@@ -77,7 +77,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     if ((node = calloc(nodeSize, 1)) == NULL)
         yyerror("Memory allocation failed!");
 
-    // TODO set the AST_NODE's type, populate contained FUNC_AST_NODE
+    // TODO set the AST_NODE's type, populate contained FUNC_AST_NODE - done
     // NOTE: you do not need to populate the "ident" field unless the function is type CUSTOM_OPER.
     // When you do have a CUSTOM_OPER, you do NOT need to allocate and strcpy here.
     // The funcName will be a string identifier for which space should be allocated in the tokenizer.
@@ -109,38 +109,61 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     return node;
 }
 
-//TODO: create SymbolNode
+//TODO: create SymbolNode - done
 AST_NODE *createSymbolNode(char *symbolName)
 {
-//    AST_NODE *node;
-//    size_t nodeSize;
-//
-//    nodeSize = sizeof(AST_NODE);
-//    if ((node = calloc(nodeSize, 1)) == NULL)
-//        yyerror("Memory allocation failed!");
-//
-//    node->symbolTable->ident = malloc(nodeSize);
-//    strcpy(node->symbolTable->ident, symbolName);
-//
-//    node->symbolTable->val = s_expr;
-//    node->symbolTable->next = NULL;
+    AST_NODE *node;
+    size_t nodeSize;
+
+    nodeSize = sizeof(AST_NODE);
+    if ((node = calloc(nodeSize, 1)) == NULL)
+        yyerror("Memory allocation failed!");
+    //set node type for reading during evaluation
+    node->type = SYMBOL_NODE_TYPE;
+    //NULL - for garbage collection
+    node->parent = NULL;
+    //setting the ident pointer to the symbolName to use the same address
+    node->data.symbol.ident = symbolName;
 }
 
-AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_section, AST_NODE *s_expr)
+AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
+//TODO attachLetSection - done
 {
-    s_expr->symbolTable = let_section;
+    s_expr->symbolTable = let_list;
+
+    SYMBOL_TABLE_NODE *temp = let_list;
+
+    while(temp =! NULL)
+    {
+        temp->val->parent = s_expr;
+        temp = let_list->next;
+    }
+
     return s_expr;
 }
 
 SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem)
+//TODO createLetList
 {
-    AST_NODE node;
-
+    //setting new elem as head
+    let_elem->next = let_list;
+    return let_elem;
 }
 
 SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr)
+//TODO createSymbolTableNode
 {
+    SYMBOL_TABLE_NODE *node;
+    size_t nodeSize;
 
+    nodeSize = sizeof(SYMBOL_TABLE_NODE);
+    if ((node = calloc(nodeSize, 1)) == NULL)
+        yyerror("Memory allocation failed!");
+    //set node type for reading during evaluation
+    node->val = s_expr;
+    node->ident = symbol;
+    //this will change once I start building the let list
+    node->next = NULL;
 }
 
 
@@ -162,8 +185,6 @@ OPER_TYPE resolveFunc(char *funcName)
 // (see the program production in ciLisp.y)
 // Recursively frees the whole abstract syntax tree.
 // You'll need to update and expand freeNode as the project develops.
-
-
 
 void freeNode(AST_NODE *node)
 {
@@ -197,7 +218,7 @@ RET_VAL eval(AST_NODE *node)
 
     RET_VAL result = {INT_TYPE, NAN}; // see NUM_AST_NODE, because RET_VAL is just an alternative name for it.
 
-    // TODO complete the switch.
+    // TODO complete the switch. - done
     // Make calls to other eval functions based on node type.
     // Use the results of those calls to populate result.
     switch (node->type)
@@ -227,7 +248,7 @@ RET_VAL evalNumNode(NUM_AST_NODE *numNode)
 
     RET_VAL result = {INT_TYPE, NAN};
 
-    // TODO populate result with the values stored in the node.
+    // TODO populate result with the values stored in the node. - done
     // SEE: AST_NODE, AST_NODE_TYPE, NUM_AST_NODE
     // assign result.value to be equal to numNode.value and thereforth
     result.value = numNode->value;
@@ -244,7 +265,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
 
     RET_VAL result = {INT_TYPE, NAN};
 
-    // TODO populate result with the result of running the function on its operands. Implement add and negate?
+    // TODO populate result with the result of running the function on its operands.  Might need to further adjust
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
 
 
@@ -331,10 +352,36 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     return result;
 }
 
+RET_VAL evalSymNode(AST_NODE *symNode)
+//TODO evalSymNode
+{
+    if (!symNode)
+        return (RET_VAL){INT_TYPE, NAN};
+
+    RET_VAL result = {INT_TYPE, NAN};
+
+    SYMBOL_TABLE_NODE *symbolTableNode_temp = symNode->symbolTable;
+    AST_NODE *astNode_temp = symNode;
+
+    //checks the symbol table for data and if it doesn't find it, it iterates to the parent node
+    while (astNode_temp != NULL)
+    {
+        while(symbolTableNode_temp != NULL)
+        {
+            if(strcmp(symNode->data.symbol.ident, symbolTableNode_temp->ident) == 0)
+            {
+                result = eval(symbolTableNode_temp->val);
+            }
+            symbolTableNode_temp = symbolTableNode_temp->next;
+        }
+     astNode_temp = astNode_temp->parent;
+    }
+    return result;
+}
 // prints the type and value of a RET_VAL
 void printRetVal(RET_VAL val)
 {
-    // TODO print the type and value of the value passed in.
+    // TODO print the type and value of the value passed in. - done
     // when is it a double type, for testing purposes it always goes into the first if statement and prints Type: int
     if(val.type == INT_TYPE)
     {
