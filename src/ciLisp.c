@@ -371,6 +371,7 @@ RET_VAL evalSymNode(AST_NODE *symNode)
             if(strcmp(symNode->data.symbol.ident, symbolTableNode_temp->ident) == 0)
             {
                 result = eval(symbolTableNode_temp->val);
+                return result;
             }
             symbolTableNode_temp = symbolTableNode_temp->next;
         }
