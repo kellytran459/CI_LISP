@@ -54,9 +54,9 @@ func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"
     }
 
 {symbol} {
-    fprintf(stderr, "lex: symbol(%s)\n", yytext);
     yylval.sval = malloc(strlen(yytext)+1);
     strcpy(yylval.sval, yytext);
+     fprintf(stderr, "lex: symbol(%s)\n", yylval.sval);
     return SYMBOL;
     }
 
