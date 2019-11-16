@@ -110,8 +110,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     else
     {
         //for debugging delete after
-        printf("op2 is Null");
-        //printError();
+        printf("op2 is Null\n");
     }
     // check that operand != CUSTOM_OPER bhen you free
     free(funcName);
@@ -235,7 +234,7 @@ RET_VAL eval(AST_NODE *node)
     switch (node->type)
     {
         case FUNC_NODE_TYPE:
-            result = evalFuncNode(&node->data.function);
+            result = evalFuncNode( &node->data.function);
             break;
         case NUM_NODE_TYPE:
             //evalNumNode(node.data.number)
@@ -409,7 +408,7 @@ void printRetVal(RET_VAL val)
     if(val.type == INT_TYPE)
     {
         printf("Type: int\n");
-        printf("%d",(int)val.value);
+        printf("%ld",(long)val.value);
     }
     else
     {
