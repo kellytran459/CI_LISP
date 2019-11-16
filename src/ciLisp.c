@@ -111,7 +111,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     {
         //for debugging delete after
         printf("op2 is Null");
-        printError();
+        //printError();
     }
     // check that operand != CUSTOM_OPER bhen you free
     free(funcName);
@@ -144,7 +144,7 @@ AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
 
     SYMBOL_TABLE_NODE *temp = let_list;
 
-    while(temp =! NULL)
+    while(temp != NULL)
     {
         temp->val->parent = s_expr;
         temp = let_list->next;
@@ -235,7 +235,7 @@ RET_VAL eval(AST_NODE *node)
     switch (node->type)
     {
         case FUNC_NODE_TYPE:
-            result = evalFuncNode( &node->data.function);
+            result = evalFuncNode(&node->data.function);
             break;
         case NUM_NODE_TYPE:
             //evalNumNode(node.data.number)
