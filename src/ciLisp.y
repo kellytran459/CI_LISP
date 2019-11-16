@@ -17,6 +17,7 @@
 %type <symAstNode> let_list let_elem let_section
 %%
 
+
 program:
     s_expr EOL {
         fprintf(stderr, "yacc: program ::= s_expr EOL\n");
@@ -64,9 +65,9 @@ number:
     };
 
 let_section:
-    LPAREN let let_list RPAREN{
-        fprintf(stderr, "yacc: let_section ::= LPAREN let let_list RPAREN\n");
-        $$ = $2;
+    LPAREN LET let_list RPAREN{
+        fprintf(stderr, "yacc: let_section ::= LPAREN LET let_list RPAREN\n");
+        $$ = $3;
 }
 
 let_list:
