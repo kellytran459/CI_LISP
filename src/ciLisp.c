@@ -99,8 +99,19 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     //  Because op2 can be null, needs special check (NULL POINTER EXCEPTION)
     //  Functions are the only place that cause parantage
     node->data.function.op1->parent = node;
-    if (op2 != NULL) {
-        node->data.function.op2->parent = node;
+
+//    if (op2 != NULL) {
+//        node->data.function.op2->parent = node;
+//    }
+    if(op2 == NULL)
+    {
+    node->data.function.op2 = op2;
+    }
+    else
+    {
+        //for debugging delete after
+        printf("op2 is Null");
+        printError();
     }
     // check that operand != CUSTOM_OPER bhen you free
     free(funcName);
@@ -230,6 +241,9 @@ RET_VAL eval(AST_NODE *node)
             //evalNumNode(node.data.number)
             result = evalNumNode(&node->data.number);
             break;
+        case SYMBOL_NODE_TYPE:
+            result = evalSymNode(node);
+            break;
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");
             break;
@@ -292,13 +306,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             result.value = exp(op1.value);
             break;
         case SQRT_OPER:
-//            if(op1.type == DOUBLE_TYPE)
-//            result.value = sqrt(op1.value);
-//            else
-//            yyerror("Integer type not allowed");
-
             result.value = sqrt(op1.value);
-
             break;
         case SUB_OPER:
             result.value = op1.value - op2.value;
@@ -307,6 +315,10 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             result.value = op1.value * op2.value;
             break;
         case DIV_OPER:
+            if(op1.value == 0)
+            {
+                printError();
+            }
             result.value = op1.value / op2.value;
             break;
         case REMAINDER_OPER:
@@ -314,6 +326,10 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
           result.value = remainder(op1.value,op2.value);
             break;
         case LOG_OPER:
+            if(op1.value == 0)
+            {
+                printError();
+            }
             result.value = log(op1.value);
             break;
         case POW_OPER: // verify that this is correct
@@ -379,6 +395,12 @@ RET_VAL evalSymNode(AST_NODE *symNode)
     }
     return result;
 }
+
+void printError()
+{
+    printf("This function is not allowed");
+    exit(0);
+}
 // prints the type and value of a RET_VAL
 void printRetVal(RET_VAL val)
 {
@@ -394,5 +416,5 @@ void printRetVal(RET_VAL val)
         printf("Type: double\n");
         printf("%lf",val.value);
     }
-
 }
+

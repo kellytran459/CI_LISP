@@ -120,6 +120,7 @@ RET_VAL evalNumNode(NUM_AST_NODE *numNode);
 RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode);
 RET_VAL evalSymNode(AST_NODE *symNode);
 
+void printError();
 void printRetVal(RET_VAL val);
 
 #endif
