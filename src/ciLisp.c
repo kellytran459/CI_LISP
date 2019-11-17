@@ -50,13 +50,12 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
         yyerror("Memory allocation failed!");
 
     // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE - done
-    node->type=NUM_NODE_TYPE;
+    node->type = NUM_NODE_TYPE;
     //node->data.number = malloc(sizeof(NUM_AST_NODE));
     node->data.number.type = type;
     node->data.number.value = value;
 
-    eval(node);
-
+   // eval(node);
     return node;
 }
 
@@ -87,34 +86,33 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     OPER_TYPE operand = resolveFunc(funcName);
     if(operand == CUSTOM_OPER)
     {
-        node->data.function.ident = (char) funcName;
+        node->data.function.ident = funcName;
+    }
+    else
+    {
+        free(funcName);
     }
     node->type = FUNC_NODE_TYPE;
     node->data.function.oper = operand;
     node->data.function.op1 = op1;
     node->data.function.op2 = op2;
-    node->data.function.ident = funcName;
 
-    //Adding parantage to op1 and op2
+    op1->parent = node;
+
+    //  Adding parantage to op1 and op2
     //  Because op2 can be null, needs special check (NULL POINTER EXCEPTION)
     //  Functions are the only place that cause parantage
-    node->data.function.op1->parent = node;
+    //node->data.function.op1->parent = node;
 
-//    if (op2 != NULL) {
-//        node->data.function.op2->parent = node;
-//    }
-    if(op2 == NULL)
-    {
-    node->data.function.op2 = op2;
+    if (op2 != NULL) {
+      //  node->data.function.op2->parent = node;
+        op2->parent = node;
     }
     else
     {
         //for debugging delete after
         printf("op2 is Null\n");
     }
-    // check that operand != CUSTOM_OPER bhen you free
-    free(funcName);
-    eval(node);
 
     return node;
 }
@@ -134,6 +132,7 @@ AST_NODE *createSymbolNode(char *symbolName)
     node->parent = NULL;
     //setting the ident pointer to the symbolName to use the same address
     node->data.symbol.ident = symbolName;
+    return node;
 }
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
@@ -174,6 +173,7 @@ SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr)
     node->ident = symbol;
     //this will change once I start building the let list
     node->next = NULL;
+    return node;
 }
 
 
@@ -234,7 +234,7 @@ RET_VAL eval(AST_NODE *node)
     switch (node->type)
     {
         case FUNC_NODE_TYPE:
-            result = evalFuncNode( &node->data.function);
+            result = evalFuncNode(&node->data.function);
             break;
         case NUM_NODE_TYPE:
             //evalNumNode(node.data.number)
