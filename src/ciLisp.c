@@ -46,7 +46,7 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
 
     // allocate space for the fixed sie and the variable part (union)
     nodeSize = sizeof(AST_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL)
+    if ((node = calloc(1, nodeSize)) == NULL)
         yyerror("Memory allocation failed!");
 
     // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE - done
@@ -73,7 +73,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
 
     // allocate space (or error)
     nodeSize = sizeof(AST_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL)
+    if ((node = calloc(1, nodeSize)) == NULL)
         yyerror("Memory allocation failed!");
 
     // TODO set the AST_NODE's type, populate contained FUNC_AST_NODE - done
@@ -111,7 +111,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     else
     {
         //for debugging delete after
-        printf("op2 is Null\n");
+        printf("op2 is Null - debugging purposes\n");
     }
 
     return node;
@@ -124,7 +124,7 @@ AST_NODE *createSymbolNode(char *symbolName)
     size_t nodeSize;
 
     nodeSize = sizeof(AST_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL)
+    if ((node = calloc(1, nodeSize )) == NULL)
         yyerror("Memory allocation failed!");
     //set node type for reading during evaluation
     node->type = SYMBOL_NODE_TYPE;
@@ -166,7 +166,7 @@ SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr)
     size_t nodeSize;
 
     nodeSize = sizeof(SYMBOL_TABLE_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL)
+    if ((node = calloc(1, nodeSize)) == NULL)
         yyerror("Memory allocation failed!");
     //set node type for reading during evaluation
     node->val = s_expr;
@@ -367,33 +367,34 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     return result;
 }
 
+
+SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
+    if (ast_Node == NULL)
+        return NULL;
+    SYMBOL_TABLE_NODE *symbolTableNode_temp = ast_Node->symbolTable;
+    while (symbolTableNode_temp != NULL) {
+        if (strcmp(symbolTableNode_temp->ident, ident) == 0)
+            return symbolTableNode_temp;
+        symbolTableNode_temp = symbolTableNode_temp->next;
+    }
+    return findSymbolTableNode(ident, ast_Node->parent);
+}
+
 RET_VAL evalSymNode(AST_NODE *symNode)
 //TODO evalSymNode
 {
     if (!symNode)
-        return (RET_VAL){INT_TYPE, NAN};
+        return (RET_VAL) {INT_TYPE, NAN};
 
     RET_VAL result = {INT_TYPE, NAN};
 
-    SYMBOL_TABLE_NODE *symbolTableNode_temp = symNode->symbolTable;
-    AST_NODE *astNode_temp = symNode;
+    SYMBOL_TABLE_NODE *node = findSymbolTableNode(symNode->data.symbol.ident, symNode);
 
-    //checks the symbol table for data and if it doesn't find it, it iterates to the parent node
-    while (astNode_temp != NULL)
-    {
-        while(symbolTableNode_temp != NULL)
-        {
-            if(strcmp(symNode->data.symbol.ident, symbolTableNode_temp->ident) == 0)
-            {
-                result = eval(symbolTableNode_temp->val);
-                return result;
-            }
-            symbolTableNode_temp = symbolTableNode_temp->next;
-        }
-     astNode_temp = astNode_temp->parent;
-    }
-    return result;
+    // eval the value fo node and return
+    return eval(node->val);
+
 }
+
 
 void printError()
 {
