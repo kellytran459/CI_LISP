@@ -108,12 +108,6 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
       //  node->data.function.op2->parent = node;
         op2->parent = node;
     }
-    else
-    {
-        //for debugging delete after
-        printf("op2 is Null - debugging purposes\n");
-    }
-
     return node;
 }
 
@@ -136,7 +130,7 @@ AST_NODE *createSymbolNode(char *symbolName)
 }
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
-//TODO attachLetSection - done
+//TODO attachLetSection - is this where it's breaking?
 {
     s_expr->symbolTable = let_list;
 
@@ -145,7 +139,7 @@ AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
     while(temp != NULL)
     {
         temp->val->parent = s_expr;
-        temp = let_list->next;
+        temp = temp->next;
     }
 
     return s_expr;
@@ -284,6 +278,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
 
     RET_VAL op1 = eval(funcNode->op1);
     RET_VAL op2 = eval(funcNode->op2);
+    RET_VAL temp = eval(funcNode->op1);
 
     if(op1.type == DOUBLE_TYPE || op2.type == DOUBLE_TYPE)
     {
@@ -303,9 +298,12 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             break;
         case EXP_OPER:
             result.value = exp(op1.value);
+            result.type = DOUBLE_TYPE;
             break;
         case SQRT_OPER:
+            result.type = DOUBLE_TYPE;
             result.value = sqrt(op1.value);
+           // result.type = DOUBLE_TYPE;
             break;
         case SUB_OPER:
             result.value = op1.value - op2.value;
@@ -314,14 +312,16 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             result.value = op1.value * op2.value;
             break;
         case DIV_OPER:
+            //if result is a double: result.type = double
             if(op1.value == 0)
             {
                 printError();
             }
+            result.type = DOUBLE_TYPE;
             result.value = op1.value / op2.value;
             break;
         case REMAINDER_OPER:
-           // result.value = op1.value % op2.value;
+            result.type = DOUBLE_TYPE;
           result.value = remainder(op1.value,op2.value);
             break;
         case LOG_OPER:
@@ -329,9 +329,12 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             {
                 printError();
             }
-            result.value = log(op1.value);
+            result.type = DOUBLE_TYPE;
+            //log or log10
+            result.value = log10(op1.value);
             break;
         case POW_OPER: // verify that this is correct
+            result.type = DOUBLE_TYPE;
             result.value = pow(op1.value, op1.value);
             break;
         case MAX_OPER:
@@ -355,12 +358,15 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             }
             break;
         case EXP2_OPER:
+            result.type = DOUBLE_TYPE;
             result.value = exp2(op1.value);
             break;
         case CBRT_OPER:
+            result.type = DOUBLE_TYPE;
             result.value = cbrt(op1.value);
             break;
         case HYPOT_OPER:
+            result.type = DOUBLE_TYPE;
             result.value = hypot(op1.value, op2.value);
             break;
     }
