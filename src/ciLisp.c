@@ -108,6 +108,10 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
       //  node->data.function.op2->parent = node;
         op2->parent = node;
     }
+    else
+    {
+        //printf("op2 is null\n");
+    }
     return node;
 }
 
@@ -231,7 +235,6 @@ RET_VAL eval(AST_NODE *node)
             result = evalFuncNode(&node->data.function);
             break;
         case NUM_NODE_TYPE:
-            //evalNumNode(node.data.number)
             result = evalNumNode(&node->data.number);
             break;
         case SYMBOL_NODE_TYPE:
@@ -240,9 +243,7 @@ RET_VAL eval(AST_NODE *node)
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");
             break;
-
     }
-
     return result;
 }
 
@@ -260,7 +261,6 @@ RET_VAL evalNumNode(NUM_AST_NODE *numNode)
     // assign result.value to be equal to numNode.value and thereforth
     result.value = numNode->value;
     result.type = numNode->type;
-
     return result;
 }
 
@@ -398,7 +398,6 @@ RET_VAL evalSymNode(AST_NODE *symNode)
 
     // eval the value fo node and return
     return eval(node->val);
-
 }
 
 
