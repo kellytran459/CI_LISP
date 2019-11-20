@@ -76,7 +76,7 @@ let_list:
         $$ = $1;
     }
     | let_list let_elem {
-        printf(stderr, "yacc: let_list ::= let_list let_elem\n");
+        fprintf(stderr, "yacc: let_list ::= let_list let_elem\n");
         $$ = createLetList($1, $2);
     }
 

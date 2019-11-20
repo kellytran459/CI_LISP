@@ -108,10 +108,10 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
       //  node->data.function.op2->parent = node;
         op2->parent = node;
     }
-    else
-    {
-        //printf("op2 is null\n");
-    }
+//    else
+//    {
+//        printf("op2 is null - for debugging purposes\n");
+//    }
     return node;
 }
 
