@@ -134,7 +134,7 @@ AST_NODE *createSymbolNode(char *symbolName)
 }
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
-//TODO attachLetSection - is this where it's breaking?
+//TODO attachLetSection - task 3
 {
     s_expr->symbolTable = let_list;
 
@@ -378,8 +378,14 @@ SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
     if (ast_Node == NULL)
         return NULL;
     SYMBOL_TABLE_NODE *symbolTableNode_temp = ast_Node->symbolTable;
+   // RET_VAL result;
+
     while (symbolTableNode_temp != NULL) {
         if (strcmp(symbolTableNode_temp->ident, ident) == 0)
+//            if(symbolTableNode_temp->val_type )
+//            {
+//
+//            }
             return symbolTableNode_temp;
         symbolTableNode_temp = symbolTableNode_temp->next;
     }
@@ -387,7 +393,7 @@ SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
 }
 
 RET_VAL evalSymNode(AST_NODE *symNode)
-//TODO evalSymNode
+//TODO evalSymNode - implement further for task 3
 {
     if (!symNode)
         return (RET_VAL) {INT_TYPE, NAN};

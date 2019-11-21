@@ -12,6 +12,7 @@ double {int}\.{digit}*
 letter [a-z]|[A-Z]
 symbol {letter}+
 func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"exp2"|"cbrt"|"hypot"
+type "int"|"double"
 
 %%
 
@@ -51,6 +52,13 @@ func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"
     strcpy(yylval.sval, yytext);
     fprintf(stderr, "lex: FUNC sval = %s\n", yylval.sval);
     return FUNC;
+    }
+
+{type} {
+    yylval.sval = (char *) malloc(strlen(yytext)*sizeof(char)+1);
+    strcpy(yylval.sval, yytext);
+    fprintf(stderr, "lex: TYPE sval = %s\n", yylval.sval);
+    return TYPE;
     }
 
 {symbol} {

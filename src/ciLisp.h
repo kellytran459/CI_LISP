@@ -56,13 +56,14 @@ typedef enum {
     SYMBOL_NODE_TYPE
 } AST_NODE_TYPE;
 
-// Types of numeric values
+
 typedef enum {
     INT_TYPE,
     DOUBLE_TYPE
 } NUM_TYPE;
 
 typedef struct symbol_table_node {
+    NUM_TYPE val_type;
     char *ident;
     struct ast_node *val;
     struct symbol_table_node *next;
