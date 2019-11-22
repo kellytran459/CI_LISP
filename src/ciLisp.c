@@ -318,7 +318,11 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             {
                 printError();
             }
-            result.type = DOUBLE_TYPE;
+            if((op1.type == INT_TYPE && op2.type == INT_TYPE))
+            {
+                result.value = floor(result.value);
+                result.type = INT_TYPE;
+            }
             result.value = op1.value / op2.value;
             break;
         case REMAINDER_OPER:
@@ -407,6 +411,13 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
         node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
         return (RET_VAL){DOUBLE_TYPE, (symbol.value)};
     }
+//    if(node->val_type == INT_TYPE && symbol.type == INT_TYPE)
+//    {
+//        printf("Precision loss\n");
+//        freeNode((node->val));
+//        node->val = createNumberNode((symbol.value), INT_TYPE);
+//        return (RET_VAL){INT_TYPE, floor(symbol.value)};
+//    }
 
     return symbol;
 }
