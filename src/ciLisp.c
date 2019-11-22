@@ -399,7 +399,7 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
     RET_VAL symbol = eval(node->val);
     if(node->val_type == INT_TYPE && symbol.type == DOUBLE_TYPE)
     {
-        printf("Precision loss\n");
+        printf("WARNING: precision loss in the assignment for variable %s\n", node->ident);
         freeNode((node->val));
         node->val = createNumberNode((symbol.value), INT_TYPE);
         return (RET_VAL){INT_TYPE, floor(symbol.value)};

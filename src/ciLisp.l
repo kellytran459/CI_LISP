@@ -12,7 +12,7 @@ double {int}\.{digit}*
 letter [a-z]|[A-Z]
 symbol {letter}+
 func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"exp2"|"cbrt"|"hypot"
-type "int"|"double"
+type "int"|"double"|"print"
 
 %%
 
