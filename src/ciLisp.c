@@ -280,6 +280,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     RET_VAL op2 = eval(funcNode->op2);
     RET_VAL temp = eval(funcNode->op1);
 
+    result.type = INT_TYPE; // Adding, subtracting, multiplying, or negating operands of type int should yield an s-expression with type int
     if(op1.type == DOUBLE_TYPE || op2.type == DOUBLE_TYPE)
     {
         result.type = DOUBLE_TYPE;
@@ -389,6 +390,27 @@ SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
     return findSymbolTableNode(ident, ast_Node->parent);
 }
 
+RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
+{
+    RET_VAL symbol = eval(node->val);
+    if(node->val_type == INT_TYPE && symbol.type == DOUBLE_TYPE)
+    {
+        printf("Precision loss\n");
+        freeNode((node->val));
+        node->val = createNumberNode((symbol.value), INT_TYPE);
+        return (RET_VAL){INT_TYPE, floor(symbol.value)};
+    }
+    if(node->val_type == DOUBLE_TYPE && symbol.type == INT_TYPE)
+    {
+        printf("No precision loss, add .0 to make it a double");
+        freeNode((node->val));
+        node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
+        return (RET_VAL){DOUBLE_TYPE, (symbol.value)};
+    }
+
+    return symbol;
+}
+
 RET_VAL evalSymNode(AST_NODE *symNode)
 //TODO evalSymNode - implement further for task 3
 {
@@ -398,9 +420,11 @@ RET_VAL evalSymNode(AST_NODE *symNode)
     RET_VAL result = {INT_TYPE, NAN};
 
     SYMBOL_TABLE_NODE *node = findSymbolTableNode(symNode->data.symbol.ident, symNode);
-
     // eval the value fo node and return
-    return eval(node->val);
+    if (node != NULL)
+        return evalSymType(node);
+
+    return evalSymNode(symNode->parent);
 }
 
 

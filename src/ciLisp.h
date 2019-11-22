@@ -119,7 +119,7 @@ RET_VAL eval(AST_NODE *node);
 RET_VAL evalNumNode(NUM_AST_NODE *numNode);
 RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode);
 RET_VAL evalSymNode(AST_NODE *symNode);
-
+RET_VAL evalSymType (SYMBOL_TABLE_NODE * node);
 void printError();
 void printRetVal(RET_VAL val);
 
