@@ -55,7 +55,7 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
     node->data.number.type = type;
     node->data.number.value = value;
 
-   // eval(node);
+    // eval(node);
     return node;
 }
 
@@ -105,7 +105,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     //node->data.function.op1->parent = node;
 
     if (op2 != NULL) {
-      //  node->data.function.op2->parent = node;
+        //  node->data.function.op2->parent = node;
         op2->parent = node;
     }
 //    else
@@ -157,18 +157,18 @@ SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE 
     return let_elem;
 }
 
-SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr)
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYPE type)
 //TODO createSymbolTableNode
 {
     SYMBOL_TABLE_NODE *node;
     size_t nodeSize;
-
     nodeSize = sizeof(SYMBOL_TABLE_NODE);
     if ((node = calloc(1, nodeSize)) == NULL)
         yyerror("Memory allocation failed!");
     //set node type for reading during evaluation
     node->val = s_expr;
     node->ident = symbol;
+    node->val_type = type;
     //this will change once I start building the let list
     node->next = NULL;
     return node;
@@ -288,11 +288,11 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     switch (funcNode->oper)
     {
         case ADD_OPER:
-                result.value = op1.value + op2.value;
-                break;
+            result.value = op1.value + op2.value;
+            break;
         case NEG_OPER:
             result.value = op1.value*-1;
-                break;
+            break;
         case ABS_OPER:
             result.value = fabs(op1.value);
             break;
@@ -303,7 +303,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
         case SQRT_OPER:
             result.type = DOUBLE_TYPE;
             result.value = sqrt(op1.value);
-           // result.type = DOUBLE_TYPE;
+            // result.type = DOUBLE_TYPE;
             break;
         case SUB_OPER:
             result.value = op1.value - op2.value;
@@ -322,7 +322,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             break;
         case REMAINDER_OPER:
             result.type = DOUBLE_TYPE;
-          result.value = remainder(op1.value,op2.value);
+            result.value = remainder(op1.value,op2.value);
             break;
         case LOG_OPER:
             if(op1.value == 0)
@@ -377,15 +377,12 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
 SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
     if (ast_Node == NULL)
         return NULL;
+
     SYMBOL_TABLE_NODE *symbolTableNode_temp = ast_Node->symbolTable;
-   // RET_VAL result;
+    // RET_VAL result;
 
     while (symbolTableNode_temp != NULL) {
         if (strcmp(symbolTableNode_temp->ident, ident) == 0)
-//            if(symbolTableNode_temp->val_type )
-//            {
-//
-//            }
             return symbolTableNode_temp;
         symbolTableNode_temp = symbolTableNode_temp->next;
     }
@@ -428,4 +425,3 @@ void printRetVal(RET_VAL val)
         printf("%lf",val.value);
     }
 }
-

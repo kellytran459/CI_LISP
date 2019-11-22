@@ -54,12 +54,9 @@ type "int"|"double"
     return FUNC;
     }
 
-{type} {
-    yylval.sval = (char *) malloc(strlen(yytext)*sizeof(char)+1);
-    strcpy(yylval.sval, yytext);
-    fprintf(stderr, "lex: TYPE sval = %s\n", yylval.sval);
-    return TYPE;
-    }
+"int" {return TYPE_INT;}
+
+"double" {return TYPE_DOUBLE;}
 
 {symbol} {
     yylval.sval = malloc(strlen(yytext)+1);
@@ -87,7 +84,7 @@ type "int"|"double"
  */
 int main(void) {
 
-    freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
+    //freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
 
     char *s_expr_str = NULL;
     size_t s_expr_str_len = 0;

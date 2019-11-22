@@ -1,4 +1,3 @@
-
 #ifndef __cilisp_h_
 #define __cilisp_h_
 
@@ -111,7 +110,7 @@ AST_NODE *createSymbolNode(char *symbolName);
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr);
 SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem);
-SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr);
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYPE type);
 
 
 void freeNode(AST_NODE *node);

@@ -9,9 +9,9 @@
     struct symbol_table_node *symAstNode;
 };
 
-%token <sval> FUNC SYMBOL TYPE
+%token <sval> FUNC SYMBOL
 %token <dval> INT DOUBLE
-%token LPAREN RPAREN EOL QUIT LET
+%token LPAREN RPAREN EOL QUIT LET TYPE_INT TYPE_DOUBLE
 
 %type <astNode> s_expr f_expr number
 %type <symAstNode> let_list let_elem let_section
@@ -34,7 +34,7 @@ s_expr:
     }
     | SYMBOL {
        fprintf(stderr, "yacc: s_expr ::= SYMBOL\n");
-               $$ = createSymbolNode($1);
+       $$ = createSymbolNode($1);
     }
     | f_expr {
         fprintf(stderr, "yacc: s_expr ::= f_expr\n");
@@ -58,6 +58,26 @@ number:
     INT {
         fprintf(stderr, "yacc: number ::= INT\n");
         $$ = createNumberNode($1, INT_TYPE);
+    }
+    | TYPE_INT INT
+    {
+    	fprintf(stderr, "yacc: number ::= TYPE_INT INT\n");
+        $$ = createNumberNode($2, INT_TYPE);
+    }
+    | TYPE_DOUBLE INT
+    {
+    	fprintf(stderr, "yacc: number ::= TYPE_DOUBLE INT\n");
+        $$ = createNumberNode($2, DOUBLE_TYPE);
+    }
+    | TYPE_INT DOUBLE
+    {
+       	fprintf(stderr, "yacc: number ::= TYPE_INT DOUBLE\n");
+         $$ = createNumberNode($2, INT_TYPE);
+    }
+    | TYPE_DOUBLE DOUBLE
+    {
+        fprintf(stderr, "yacc: number ::= TYPE_DOUBLE DOUBLE\n");
+        $$ = createNumberNode($2, DOUBLE_TYPE);
     }
     | DOUBLE {
         fprintf(stderr, "yacc: number ::= DOUBLE\n");
@@ -83,12 +103,16 @@ let_list:
 let_elem:
     LPAREN SYMBOL s_expr RPAREN {
         fprintf(stderr, "yacc: let_elem ::= LPAREN SYMBOL s_expr RPAREN\n");
-        $$ = createSymbolTableNode($2, $3);
+        $$ = createSymbolTableNode($2, $3, NULL);
     }
-    | LPAREN TYPE SYMBOL s_expr RPAREN {
+    | LPAREN TYPE_INT SYMBOL s_expr RPAREN {
     	fprintf(stderr, "yacc: let_elem ::= LPAREN TYPE SYMBOL s_expr RPAREN\n");
-        $$ = createSymbolTableNode($2, $3, $4);
+        $$ = createSymbolTableNode($3, $4, INT_TYPE);
     }
+    | LPAREN TYPE_DOUBLE SYMBOL s_expr RPAREN {
+        fprintf(stderr, "yacc: let_elem ::= LPAREN TYPE SYMBOL s_expr RPAREN\n");
+        $$ = createSymbolTableNode($3, $4, DOUBLE_TYPE);
+     };
 
 f_expr:
     LPAREN FUNC s_expr RPAREN {
