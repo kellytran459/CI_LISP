@@ -123,4 +123,5 @@ f_expr:
         fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr s_expr RPAREN\n");
         $$ = createFunctionNode($2, $3, $4);
     };
+
 %%

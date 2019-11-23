@@ -374,6 +374,9 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             result.type = DOUBLE_TYPE;
             result.value = hypot(op1.value, op2.value);
             break;
+        case PRINT_OPER:
+            result.value = op1.value;
+        break;
     }
     return result;
 }
@@ -411,13 +414,6 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
         node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
         return (RET_VAL){DOUBLE_TYPE, (symbol.value)};
     }
-//    if(node->val_type == INT_TYPE && symbol.type == INT_TYPE)
-//    {
-//        printf("Precision loss\n");
-//        freeNode((node->val));
-//        node->val = createNumberNode((symbol.value), INT_TYPE);
-//        return (RET_VAL){INT_TYPE, floor(symbol.value)};
-//    }
 
     return symbol;
 }
