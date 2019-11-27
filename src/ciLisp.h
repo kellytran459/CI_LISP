@@ -80,13 +80,17 @@ typedef struct {
 typedef NUM_AST_NODE RET_VAL;
 
 // Node to store a function call with its inputs
+//typedef struct {
+//    OPER_TYPE oper;
+//    char* ident; // only needed for custom functions
+//    struct ast_node *op1;
+//    struct ast_node *op2;
+//} FUNC_AST_NODE;
 typedef struct {
     OPER_TYPE oper;
-    char* ident; // only needed for custom functions
-    struct ast_node *op1;
-    struct ast_node *op2;
+    char* ident;
+    struct ast_node *opList;
 } FUNC_AST_NODE;
-
 //typedef struct {
 //   char *name;
 //   struct ast_node *opList;
@@ -111,13 +115,13 @@ typedef struct ast_node {
 } AST_NODE;
 
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
-AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2);
+AST_NODE *createFunctionNode(char *funcName, AST_NODE *op_list);
 AST_NODE *createSymbolNode(char *symbolName);
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr);
 SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem);
 SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYPE type);
-
+AST_NODE *attachExprLists(AST_NODE *list, AST_NODE *item);
 
 void freeNode(AST_NODE *node);
 

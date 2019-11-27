@@ -66,7 +66,7 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
 //      - An OPER_TYPE (the enum identifying the specific function being called)
 //      - 2 AST_NODEs, the operands
 // SEE: AST_NODE, FUNC_AST_NODE, AST_NODE_TYPE.
-AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
+AST_NODE *createFunctionNode(char *funcName, AST_NODE *op_list)
 {
     AST_NODE *node;
     size_t nodeSize;
@@ -94,23 +94,26 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1, AST_NODE *op2)
     }
     node->type = FUNC_NODE_TYPE;
     node->data.function.oper = operand;
-    node->data.function.op1 = op1;
-    node->data.function.op2 = op2;
+    node->data.function.opList = op_list;
 
-    op1->parent = node;
-
-    //  Adding parantage to op1 and op2
-    //  Because op2 can be null, needs special check (NULL POINTER EXCEPTION)
-    //  Functions are the only place that cause parantage
-    //node->data.function.op1->parent = node;
-
-    if (op2 != NULL) {
-        //  node->data.function.op2->parent = node;
-        op2->parent = node;
+    while (op_list != NULL)
+    {
+        op_list->parent = node;
+        op_list = op_list->next;
     }
-//    else
-//    {
-//        printf("op2 is null - for debugging purposes\n");
+//    node->data.function.op1 = op1;
+//    node->data.function.op2 = op2;
+//
+//    op1->parent = node;
+//
+//    //  Adding parantage to op1 and op2
+//    //  Because op2 can be null, needs special check (NULL POINTER EXCEPTION)
+//    //  Functions are the only place that cause parantage
+//    //node->data.function.op1->parent = node;
+//
+//    if (op2 != NULL) {
+//        //  node->data.function.op2->parent = node;
+//        op2->parent = node;
 //    }
     return node;
 }
@@ -155,6 +158,12 @@ SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE 
     //setting new elem as head
     let_elem->next = let_list;
     return let_elem;
+}
+
+AST_NODE *attachExprLists(AST_NODE *item, AST_NODE *list)
+{
+    item->next = list;
+    return item;
 }
 
 SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYPE type)
@@ -202,8 +211,7 @@ void freeNode(AST_NODE *node)
     if (node->type == FUNC_NODE_TYPE)
     {
         // Recursive calls to free child nodes
-        freeNode(node->data.function.op1);
-        freeNode(node->data.function.op2);
+        freeNode(node->data.function.opList);
 
         // Free up identifier string if necessary
         if (node->data.function.oper == CUSTOM_OPER)
@@ -270,15 +278,15 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     if (!funcNode)
         return (RET_VAL){INT_TYPE, NAN};
 
-    RET_VAL result = {INT_TYPE, NAN};
+    RET_VAL result = {INT_TYPE, 0};
 
     // TODO populate result with the result of running the function on its operands.  Might need to further adjust
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
 
 
-    RET_VAL op1 = eval(funcNode->op1);
-    RET_VAL op2 = eval(funcNode->op2);
-    RET_VAL temp = eval(funcNode->op1);
+
+    RET_VAL op1 = eval(funcNode->opList);
+    RET_VAL op2 = eval(funcNode->opList->next);
 
     result.type = INT_TYPE; // Adding, subtracting, multiplying, or negating operands of type int should yield an s-expression with type int
     if(op1.type == DOUBLE_TYPE || op2.type == DOUBLE_TYPE)
@@ -289,7 +297,12 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     switch (funcNode->oper)
     {
         case ADD_OPER:
-            result.value = op1.value + op2.value;
+            while(funcNode->opList != NULL)
+            {
+                result.value += eval(funcNode->opList).value;
+                funcNode->opList = funcNode->opList->next;
+            }
+            result.type = DOUBLE_TYPE;
             break;
         case NEG_OPER:
             result.value = op1.value*-1;
@@ -310,7 +323,11 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             result.value = op1.value - op2.value;
             break;
         case MULT_OPER:
-            result.value = op1.value * op2.value;
+             while(funcNode->opList != NULL)
+    {
+        result.value *= eval(funcNode->opList).value;
+        funcNode->opList = funcNode->opList->next;
+    }
             break;
         case DIV_OPER:
             //if result is a double: result.type = double
@@ -375,7 +392,11 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             result.value = hypot(op1.value, op2.value);
             break;
         case PRINT_OPER:
-            result.value = op1.value;
+            while(funcNode->opList != NULL)
+            {
+                printf("%f\n",eval(funcNode->opList).value);
+                funcNode->opList = funcNode->opList->next;
+            }
         break;
     }
     return result;
@@ -409,7 +430,7 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
     }
     if(node->val_type == DOUBLE_TYPE && symbol.type == INT_TYPE)
     {
-        printf("No precision loss, add .0 to make it a double");
+        printf("No precision loss, add .0 to make it a double\n");
         freeNode((node->val));
         node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
         return (RET_VAL){DOUBLE_TYPE, (symbol.value)};

@@ -117,17 +117,17 @@ let_elem:
 f_expr:
     LPAREN FUNC s_expr_list RPAREN {
         fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr_list RPAREN\n");
-        $$ = createFunctionNode($2, $3, NULL);
+        $$ = createFunctionNode($2, $3);
     };
 
 s_expr_list:
 	s_expr s_expr_list {
 	 fprintf(stderr, "yacc: s_expr_list ::= s_expr s_expr_list\n");
-                $$ = createFunctionNode($2, $3);
+                $$ = attachExprLists($1, $2);
 	}
 	| s_expr {
 	 fprintf(stderr, "yacc: s_expr_list ::= s_expr\n");
-                        $$ = createFunctionNode($1);
+                        $$ = $1;
 	};
 
 
