@@ -13,7 +13,7 @@
 %token <dval> INT DOUBLE
 %token LPAREN RPAREN EOL QUIT LET TYPE_INT TYPE_DOUBLE
 
-%type <astNode> s_expr f_expr number
+%type <astNode> s_expr f_expr number s_expr_list
 %type <symAstNode> let_list let_elem let_section
 %%
 
@@ -115,13 +115,20 @@ let_elem:
      };
 
 f_expr:
-    LPAREN FUNC s_expr RPAREN {
-        fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr RPAREN\n");
+    LPAREN FUNC s_expr_list RPAREN {
+        fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr_list RPAREN\n");
         $$ = createFunctionNode($2, $3, NULL);
-    }
-    | LPAREN FUNC s_expr s_expr RPAREN {
-        fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr s_expr RPAREN\n");
-        $$ = createFunctionNode($2, $3, $4);
     };
+
+s_expr_list:
+	s_expr s_expr_list {
+	 fprintf(stderr, "yacc: s_expr_list ::= s_expr s_expr_list\n");
+                $$ = createFunctionNode($2, $3);
+	}
+	| s_expr {
+	 fprintf(stderr, "yacc: s_expr_list ::= s_expr\n");
+                        $$ = createFunctionNode($1);
+	};
+
 
 %%

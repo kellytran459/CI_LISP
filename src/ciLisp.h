@@ -87,6 +87,11 @@ typedef struct {
     struct ast_node *op2;
 } FUNC_AST_NODE;
 
+//typedef struct {
+//   char *name;
+//   struct ast_node *opList;
+//} FUNC_AST_NODE;
+
 typedef struct symbol_ast_node {
     char *ident;
 } SYM_AST_NODE;
@@ -102,6 +107,7 @@ typedef struct ast_node {
         FUNC_AST_NODE function;
         SYM_AST_NODE symbol;
     } data;
+    struct ast_node *next;
 } AST_NODE;
 
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
