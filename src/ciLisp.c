@@ -278,12 +278,13 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     if (!funcNode)
         return (RET_VAL){INT_TYPE, NAN};
 
-    RET_VAL result = {INT_TYPE, 0};
+    RET_VAL result = {INT_TYPE, NAN};
 
     // TODO populate result with the result of running the function on its operands.  Might need to further adjust
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
 
-
+    if (!funcNode->opList)
+        return result;
 
     RET_VAL op1 = eval(funcNode->opList);
     RET_VAL op2 = eval(funcNode->opList->next);
@@ -297,6 +298,7 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     switch (funcNode->oper)
     {
         case ADD_OPER:
+            result.value = 0.0;
             while(funcNode->opList != NULL)
             {
                 result.value += eval(funcNode->opList).value;
@@ -324,10 +326,10 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
             break;
         case MULT_OPER:
              while(funcNode->opList != NULL)
-    {
-        result.value *= eval(funcNode->opList).value;
-        funcNode->opList = funcNode->opList->next;
-    }
+            {
+                result.value *= eval(funcNode->opList).value;
+                funcNode->opList = funcNode->opList->next;
+            }
             break;
         case DIV_OPER:
             //if result is a double: result.type = double
@@ -402,6 +404,97 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     return result;
 }
 
+RET_VAL evalUnary(FUNC_AST_NODE *s_expr)
+{
+    AST_NODE *op1Node = s_expr->opList;
+    if(op1Node == NULL)
+    {
+        printf("ERROR: NOT ENOUGH ARGUMENTS");
+    }
+    if(op1Node->next != NULL)
+    {
+        printf("WARNING: TOO MANY ARGUMENTS");
+    }
+
+    switch (s_expr->oper)
+    {
+        case NEG_OPER:
+            result.value = op1.value*-1;
+            break;
+        case ABS_OPER:
+            result.value = fabs(op1.value);
+            break;
+        case EXP_OPER:
+            result.value = exp(op1.value);
+            result.type = DOUBLE_TYPE;
+            break;
+        case SQRT_OPER:
+            result.type = DOUBLE_TYPE;
+            result.value = sqrt(op1.value);
+            // result.type = DOUBLE_TYPE;
+            break;
+
+        case LOG_OPER:
+            if(op1.value == 0)
+            {
+                printError();
+            }
+            result.type = DOUBLE_TYPE;
+            //log or log10
+            result.value = log10(op1.value);
+            break;
+        case POW_OPER: // verify that this is correct
+            result.type = DOUBLE_TYPE;
+            result.value = pow(op1.value, op1.value);
+            break;
+        case EXP2_OPER:
+            result.type = DOUBLE_TYPE;
+            result.value = exp2(op1.value);
+            break;
+        case CBRT_OPER:
+            result.type = DOUBLE_TYPE;
+            result.value = cbrt(op1.value);
+            break;
+        case HYPOT_OPER:
+            result.type = DOUBLE_TYPE;
+            result.value = hypot(op1.value, op2.value);
+            break;
+        case PRINT_OPER:
+            while(funcNode->opList != NULL)
+            {
+                printf("%f\n",eval(funcNode->opList).value);
+                funcNode->opList = funcNode->opList->next;
+            }
+            break;
+    }
+    RET_VAL op1 = eval(op1Node);
+    return op1;
+}
+
+void evalBinary(FUNC_AST_NODE *s_expr)
+{
+    AST_NODE *op1Node = s_expr->opList;
+    if(op1Node == NULL)
+    {
+        printf("ERROR: NOT ENOUGH ARGUMENTS");
+    }
+
+    AST_NODE *op2Node = op1Node->next;
+    if(op2Node->next == NULL)
+    {
+        printf("ERROR: NOT ENOUGH ARGUMENTS");
+    }
+
+    if(op2Node->next != NULL)
+    {
+        printf("WARNING: TOO MANY ARGUMENTS");
+    }
+
+    RET_VAL op1 = eval(op1Node);
+    RET_VAL op2 = eval(op2Node);
+}
+
+
 
 SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
     if (ast_Node == NULL)
@@ -424,15 +517,15 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
     if(node->val_type == INT_TYPE && symbol.type == DOUBLE_TYPE)
     {
         printf("WARNING: precision loss in the assignment for variable %s\n", node->ident);
-        freeNode((node->val));
-        node->val = createNumberNode((symbol.value), INT_TYPE);
+       // freeNode((node->val));
+       // node->val = createNumberNode((symbol.value), INT_TYPE);
         return (RET_VAL){INT_TYPE, floor(symbol.value)};
     }
     if(node->val_type == DOUBLE_TYPE && symbol.type == INT_TYPE)
     {
-        printf("No precision loss, add .0 to make it a double\n");
-        freeNode((node->val));
-        node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
+        //printf("No precision loss, add .0 to make it a double\n");
+        //freeNode((node->val));
+        //node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
         return (RET_VAL){DOUBLE_TYPE, (symbol.value)};
     }
 
@@ -444,8 +537,6 @@ RET_VAL evalSymNode(AST_NODE *symNode)
 {
     if (!symNode)
         return (RET_VAL) {INT_TYPE, NAN};
-
-    RET_VAL result = {INT_TYPE, NAN};
 
     SYMBOL_TABLE_NODE *node = findSymbolTableNode(symNode->data.symbol.ident, symNode);
     // eval the value fo node and return
@@ -469,11 +560,11 @@ void printRetVal(RET_VAL val)
     if(val.type == INT_TYPE)
     {
         printf("Type: int\n");
-        printf("%ld",(long)val.value);
+        printf("Value: %.0lf",val.value);
     }
     else
     {
         printf("Type: double\n");
-        printf("%lf",val.value);
+        printf("Value: %.2lf",val.value);
     }
 }
