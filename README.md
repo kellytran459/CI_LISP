@@ -55,4 +55,32 @@ Here, this function was first created and implemented to set a symbol table node
 ### ciLisp.y
 implemented the updated grammer in this file, also added ast_node and symbol_table_node to the union, added LET to the token, created two types(astNode and symAstNode)
 
-### Sample runs:
+## Task 3
+### ciLisp.c
+#### evalSymType
+This method evaluates the symbol type when it's casted and the type adjusts accordingly
+#### evalSymNode
+Fixed this method to work with new implemented method (evalSymType)
+### ciLisp.h
+- added the evalSymType 
+### ciLisp.l
+- added double and int token
+### ciLisp.y
+changed grammar in y file to take in casting grammar(type)
+
+## Task 4
+### ciLisp.c
+implemented print function to evalFuncNode
+### ciLisp.l
+- added "print" key word to lex
+
+## Task 5 
+### ciLisp.c
+Created many helper functions. The helper functions essentially count the amount of parameters from the console and check if the function operater is able to take in the number by evaluating if it's too less or too many parameters. Add, mult, print, and div have their own functions that get called recursively.
+### ciLisp.h
+The h file was changed according to the changes that canvas said to change and changed the h file to match the c file
+### ciLisp.y
+fixed y file to match new grammar with s_expr list
+
+
+
