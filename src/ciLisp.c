@@ -311,6 +311,9 @@ int maxNumOfParameters (OPER_TYPE oper)
         case MAX_OPER:
         case MIN_OPER:
         case HYPOT_OPER:
+        case GREATER_OPER:
+        case LESS_OPER:
+        case EQUAL_OPER:
             return 2;
         case ADD_OPER:
         case MULT_OPER:
@@ -347,6 +350,9 @@ int minNumOfParameters (OPER_TYPE oper)
         case HYPOT_OPER:
         case ADD_OPER:
         case MULT_OPER:
+        case GREATER_OPER:
+        case LESS_OPER:
+        case EQUAL_OPER:
             return 2;
         default:
             printf("Undefined");
@@ -691,6 +697,7 @@ void printRetVal(RET_VAL val)
     }
     else
     {
+        // remove this at the end
         printf("Type: double\n");
         printf("%lf",val.value);
     }
