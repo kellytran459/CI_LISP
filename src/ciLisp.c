@@ -60,6 +60,37 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
     return node;
 }
 
+RET_VAL read()
+{
+    RET_VAL result = {INT_TYPE, NAN};
+//    double val = 0.0;
+//    NUM_TYPE type = INT_TYPE;
+    char buf[1024];
+    printf("read :=");
+    fgets(buf, 1024, stdin);
+
+    if(NULL != strchr(buf, '.'))
+    {
+        result.type = DOUBLE_TYPE;
+    }
+    result.value = strtod(buf, NULL);
+
+    return result;
+}
+
+double randomGenerator()
+{
+    //return a random double in [0.0, 1.0)
+    double res = (rand() % RAND_MAX) / (double)RAND_MAX;
+    return res;
+}
+
+
+RET_VAL evalRand() {
+    return (RET_VAL) {DOUBLE_TYPE, randomGenerator()};
+}
+
+
 // Called when an f_expr is created (see ciLisp.y).
 // Creates an AST_NODE for a function call.
 // Sets the created AST_NODE's type to function.
@@ -102,20 +133,6 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *op_list)
         op_list->parent = node;
         op_list = op_list->next;
     }
-//    node->data.function.op1 = op1;
-//    node->data.function.op2 = op2;
-//
-//    op1->parent = node;
-//
-//    //  Adding parantage to op1 and op2
-//    //  Because op2 can be null, needs special check (NULL POINTER EXCEPTION)
-//    //  Functions are the only place that cause parantage
-//    //node->data.function.op1->parent = node;
-//
-//    if (op2 != NULL) {
-//        //  node->data.function.op2->parent = node;
-//        op2->parent = node;
-//    }
     return node;
 }
 
@@ -176,7 +193,23 @@ SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYP
     if ((node = calloc(1, nodeSize)) == NULL)
         yyerror("Memory allocation failed!");
     //set node type for reading during evaluation
-    node->val = s_expr;
+    if(s_expr->type == FUNC_NODE_TYPE && (s_expr->data.function.oper == READ_OPER || s_expr->data.function.oper == RAND_OPER)) {
+        if(s_expr->data.function.oper == READ_OPER)
+        {
+            RET_VAL result = read();
+            AST_NODE *val = createNumberNode(result.value, result.type);
+            node->val = val;
+            freeNode(s_expr);
+        }
+       else if(s_expr->data.function.oper == RAND_OPER){
+           RET_VAL result = evalRand();
+            AST_NODE *val = createNumberNode(result.value, result.type);
+            node->val = val;
+            freeNode(s_expr);
+       }
+    } else {
+        node->val = s_expr;
+    }
     node->ident = symbol;
     node->val_type = type;
     //this will change once I start building the let list
@@ -409,6 +442,7 @@ RET_VAL divide(AST_NODE *funcNode)
 }
 
 
+
 double evalFuncNodeVal (OPER_TYPE oper, double op1, double op2)
 {
     switch (oper)
@@ -445,28 +479,36 @@ double evalFuncNodeVal (OPER_TYPE oper, double op1, double op2)
             return cbrt(op1);
         case HYPOT_OPER:
             return hypot(op1,op2);
-
+        case GREATER_OPER:
+            if(op1 > op2)
+            {
+                return 1.0;
+            }
+            else
+            {
+                return 0.0;
+            }
+        case LESS_OPER:
+            if(op1 < op2)
+            {
+                return 1.0;
+            }
+            else
+            {
+                return 0.0;
+            }
+        case EQUAL_OPER:
+            if(op1 == op2)
+            {
+                return 1.0;
+            }
+            else
+            {
+                return 0.0;
+            }
     }
 }
-//
-//NUM_TYPE evalFuncType (OPER_TYPE oper, NUM_TYPE op1, NUM_TYPE op2)
-//{
-//    if(op1 == INT_TYPE)
-//    {
-//        if(oper == NEG_OPER)
-//        {
-//            return INT_TYPE;
-//        }
-//        if(oper == ADD_OPER || oper == SUB_OPER || oper == MULT_OPER || oper == DIV_OPER)
-//        {
-//            if(op2 == INT_TYPE)
-//            {
-//                return INT_TYPE;
-//            }
-//        }
-//    }
-//    return DOUBLE_TYPE;
-//}
+
 
 
 RET_VAL add(AST_NODE *funcNode)
@@ -496,11 +538,6 @@ RET_VAL mult(AST_NODE *funcNode)
     {
         return (RET_VAL){INT_TYPE, 1.0};
     }
-
-//    if(funcNode->next == NULL)
-//    {
-//        return eval(funcNode);
-//    }
 
     RET_VAL result = mult(funcNode->next);
     RET_VAL temp = eval(funcNode);
@@ -534,6 +571,8 @@ RET_VAL print (AST_NODE *func)
     return var;
 }
 
+
+
 RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
 {
 //    if (!funcNode)
@@ -544,7 +583,12 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
     // TODO populate result with the result of running the function on its operands.  Might need to further adjust
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
 
-
+    if(funcNode->oper == READ_OPER) {
+        return read();
+    }
+    if(funcNode->oper == RAND_OPER) {
+        return evalRand();
+    }
     if(!evalParameters(funcNode->oper, funcNode->opList))
     {
         return (RET_VAL){INT_TYPE, NAN};
@@ -571,22 +615,9 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
 
     return (RET_VAL)
             {
-        /*
-         * TODO - Incorrect below?
-         */
                     evalFuncType(funcNode->oper, op1.type, op2.type),
                     evalFuncNodeVal(funcNode->oper, op1.value, op2.value)
             };
-
-
-//    result.type = INT_TYPE; // Adding, subtracting, multiplying, or negating operands of type int should yield an s-expression with type int
-//    if(op1.type == DOUBLE_TYPE || op2.type == DOUBLE_TYPE)
-//    {
-//        result.type = DOUBLE_TYPE;
-//    }
-    //result.type = DOUBLE_TYPE;
-
-
 }
 
 
@@ -605,34 +636,7 @@ SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
     return findSymbolTableNode(ident, ast_Node->parent);
 }
 
-//RET_VAL evalSymType (SYMBOL_TABLE_NODE * node)
-//{
-//    RET_VAL symbol = eval(node->val);
-//    if(node->val_type == INT_TYPE && symbol.type == DOUBLE_TYPE)
-//    {
-//        printf("WARNING: precision loss in the assignment for variable %s\n", node->ident);
-//        freeNode((node->val));
-//        node->val = createNumberNode((symbol.value), INT_TYPE);
-//        return (RET_VAL){INT_TYPE, floor(symbol.value)};
-//    }
-//    if(node->val_type == DOUBLE_TYPE && symbol.type == INT_TYPE)
-//    {
-//      //  printf("No precision loss, add .0 to make it a double\n");
-////        freeNode((node->val));
-////        node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
-//        return (RET_VAL){DOUBLE_TYPE, (symbol.value)};
-//    }
-//
-//    if(node->val_type == INT_TYPE && symbol.type == INT_TYPE)
-//    {
-//        //  printf("No precision loss, add .0 to make it a double\n");
-////        freeNode((node->val));
-////        node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
-//        return (RET_VAL){INT_TYPE, (symbol.value)};
-//    }
-//
-//    return symbol;
-//}
+
 
 RET_VAL evalSymType (SYMBOL_TABLE_NODE * node, RET_VAL val)
 {
@@ -647,19 +651,8 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node, RET_VAL val)
     if(node->val_type == DOUBLE_TYPE && val.type == INT_TYPE)
     {
         //  printf("No precision loss, add .0 to make it a double\n");
-//        freeNode((node->val));
-//        node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
         return (RET_VAL){DOUBLE_TYPE, (val.value)};
     }
-
-//    if(node->val_type == INT_TYPE && val.type == INT_TYPE)
-//    {
-//         printf("No precision loss, add .0 to make it a double\n");
-////        freeNode((node->val));
-////        node->val = createNumberNode((symbol.value), DOUBLE_TYPE);
-//        return (RET_VAL){INT_TYPE, (val.value)};
-//    }
-
     return val;
 }
 

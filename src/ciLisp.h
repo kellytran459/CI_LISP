@@ -79,22 +79,15 @@ typedef struct {
 // The line below allows us to give this struct another name for readability.
 typedef NUM_AST_NODE RET_VAL;
 
-// Node to store a function call with its inputs
-//typedef struct {
-//    OPER_TYPE oper;
-//    char* ident; // only needed for custom functions
-//    struct ast_node *op1;
-//    struct ast_node *op2;
+
 //} FUNC_AST_NODE;
 typedef struct {
     OPER_TYPE oper;
     char* ident;
     struct ast_node *opList;
 } FUNC_AST_NODE;
-//typedef struct {
-//   char *name;
-//   struct ast_node *opList;
-//} FUNC_AST_NODE;
+
+
 
 typedef struct symbol_ast_node {
     char *ident;
@@ -129,8 +122,8 @@ RET_VAL eval(AST_NODE *node);
 RET_VAL evalNumNode(NUM_AST_NODE *numNode);
 RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode);
 RET_VAL evalSymNode(AST_NODE *symNode);
-//RET_VAL evalSymType (SYMBOL_TABLE_NODE * node);
-RET_VAL evalSymType (SYMBOL_TABLE_NODE * node, RET_VAL val);
+
+
 void printError();
 void printRetVal(RET_VAL val);
 

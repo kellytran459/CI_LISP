@@ -88,7 +88,10 @@ let_section:
     LPAREN LET let_list RPAREN{
         fprintf(stderr, "yacc: let_section ::= LPAREN LET let_list RPAREN\n");
         $$ = $3;
-}
+	}
+	| {
+		$$ = NULL;
+	};
 
 let_list:
     let_elem {
@@ -98,7 +101,7 @@ let_list:
     | let_list let_elem {
         fprintf(stderr, "yacc: let_list ::= let_list let_elem\n");
         $$ = createLetList($1, $2);
-    }
+    };
 
 let_elem:
     LPAREN SYMBOL s_expr RPAREN {
@@ -128,6 +131,9 @@ s_expr_list:
 	| s_expr {
 	 fprintf(stderr, "yacc: s_expr_list ::= s_expr\n");
                         $$ = $1;
+	}
+	| /*empty*/ {
+		$$ = NULL;
 	};
 
 

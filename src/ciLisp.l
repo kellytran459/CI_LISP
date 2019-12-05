@@ -11,7 +11,7 @@ int [+-]?{digit}+
 double {int}\.{digit}*
 letter [a-z]|[A-Z]
 symbol {letter}+
-func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"exp2"|"cbrt"|"hypot"|"print"
+func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"exp2"|"cbrt"|"hypot"|"print"|"rand"|"read"|"equal"|"less"|"greater"
 type "int"|"double"
 
 %%
@@ -84,7 +84,7 @@ type "int"|"double"
  */
 int main(void) {
 
-  // freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
+  //c freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
 
     char *s_expr_str = NULL;
     size_t s_expr_str_len = 0;
