@@ -222,12 +222,14 @@ SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYP
             RET_VAL result = read();
             AST_NODE *val = createNumberNode(result.value, result.type);
             node->val = val;
+            node->val_type = NO_TYPE;
             freeNode(s_expr);
         }
        else if(s_expr->data.function.oper == RAND_OPER){
-           RET_VAL result = evalRand();
+            RET_VAL result = evalRand();
             AST_NODE *val = createNumberNode(result.value, DOUBLE_TYPE);
             node->val = val;
+            node->val_type = DOUBLE_TYPE;
             freeNode(s_expr);
        }
     } else {

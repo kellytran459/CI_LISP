@@ -64,6 +64,7 @@ typedef struct {
 } COND_AST_NODE;
 
 typedef enum {
+    NO_TYPE,
     INT_TYPE,
     DOUBLE_TYPE
 } NUM_TYPE;
