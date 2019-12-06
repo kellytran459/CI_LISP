@@ -11,7 +11,7 @@
 
 %token <sval> FUNC SYMBOL
 %token <dval> INT DOUBLE
-%token LPAREN RPAREN EOL QUIT LET TYPE_INT TYPE_DOUBLE
+%token LPAREN RPAREN EOL QUIT LET TYPE_INT TYPE_DOUBLE COND
 
 %type <astNode> s_expr f_expr number s_expr_list
 %type <symAstNode> let_list let_elem let_section
@@ -43,6 +43,11 @@ s_expr:
     | LPAREN let_section s_expr RPAREN {
         fprintf(stderr, "yacc: s_expr ::= LPAREN let_section s_expr RPAREN\n");
         $$ = attachLetSection($2, $3);
+    }
+    | LPAREN COND s_expr s_expr s_expr RPAREN
+    {
+    fprintf(stderr, "yacc: s_expr ::= LPAREN let_section s_expr RPAREN\n");
+            $$ = createConditionNode($3, $4, $5);
     }
     | QUIT {
         fprintf(stderr, "yacc: s_expr ::= QUIT\n");

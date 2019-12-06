@@ -52,9 +52,16 @@ OPER_TYPE resolveFunc(char *);
 typedef enum {
     NUM_NODE_TYPE,
     FUNC_NODE_TYPE,
-    SYMBOL_NODE_TYPE
+    SYMBOL_NODE_TYPE,
+    COND_NODE_TYPE
 } AST_NODE_TYPE;
 
+
+typedef struct {
+    struct ast_node *cond;
+    struct ast_node *nonzero; // to eval if cond is nonzero
+    struct ast_node *zero; // to eval if cond is zero
+} COND_AST_NODE;
 
 typedef enum {
     INT_TYPE,
@@ -103,6 +110,7 @@ typedef struct ast_node {
         NUM_AST_NODE number;
         FUNC_AST_NODE function;
         SYM_AST_NODE symbol;
+        COND_AST_NODE condition;
     } data;
     struct ast_node *next;
 } AST_NODE;
@@ -110,6 +118,8 @@ typedef struct ast_node {
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
 AST_NODE *createFunctionNode(char *funcName, AST_NODE *op_list);
 AST_NODE *createSymbolNode(char *symbolName);
+AST_NODE *createConditionNode(AST_NODE *cond, AST_NODE *nonzero, AST_NODE *zero);
+
 
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr);
 SYMBOL_TABLE_NODE *createLetList(SYMBOL_TABLE_NODE *let_list, SYMBOL_TABLE_NODE *let_elem);

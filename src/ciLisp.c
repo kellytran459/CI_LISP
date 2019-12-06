@@ -154,6 +154,29 @@ AST_NODE *createSymbolNode(char *symbolName)
     return node;
 }
 
+AST_NODE *createConditionNode(AST_NODE *cond, AST_NODE *nonzero, AST_NODE *zero)
+{
+    AST_NODE *node;
+    size_t nodeSize;
+
+    nodeSize = sizeof(AST_NODE);
+    if ((node = calloc(1, nodeSize )) == NULL)
+        yyerror("Memory allocation failed!");
+
+    node->type = COND_NODE_TYPE;
+    node->data.condition.cond = cond;
+    node->data.condition.nonzero = nonzero;
+    node->data.condition.zero = zero;
+
+    if(node->data.condition.cond != NULL)
+        node->data.condition.cond->parent = node;
+    if(node->data.condition.nonzero != NULL)
+        node->data.condition.nonzero->parent = node;
+    if(node->data.condition.zero != NULL)
+        node->data.condition.zero->parent = node;
+    return node;
+}
+
 AST_NODE *attachLetSection(SYMBOL_TABLE_NODE *let_list, AST_NODE *s_expr)
 //TODO attachLetSection - task 3
 {
@@ -203,7 +226,7 @@ SYMBOL_TABLE_NODE *createSymbolTableNode(char *symbol, AST_NODE *s_expr, NUM_TYP
         }
        else if(s_expr->data.function.oper == RAND_OPER){
            RET_VAL result = evalRand();
-            AST_NODE *val = createNumberNode(result.value, result.type);
+            AST_NODE *val = createNumberNode(result.value, DOUBLE_TYPE);
             node->val = val;
             freeNode(s_expr);
        }
@@ -257,6 +280,14 @@ void freeNode(AST_NODE *node)
     free(node);
 }
 
+RET_VAL evalCondNode(AST_NODE *condNode)
+{
+    if(eval(condNode->data.condition.cond).value)
+        return eval(condNode->data.condition.nonzero);
+
+    return eval(condNode->data.condition.zero);
+}
+
 // Evaluates an AST_NODE.
 // returns a RET_VAL storing the the resulting value and type.
 // You'll need to update and expand eval (and the more specific eval functions below)
@@ -281,6 +312,9 @@ RET_VAL eval(AST_NODE *node)
             break;
         case SYMBOL_NODE_TYPE:
             result = evalSymNode(node);
+            break;
+        case COND_NODE_TYPE:
+            result = evalCondNode(node);
             break;
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");
@@ -678,6 +712,7 @@ RET_VAL evalSymNode(AST_NODE *symNode)
 
     return evalSymNode(symNode->parent);
 }
+
 
 
 void printError()
