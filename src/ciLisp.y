@@ -126,6 +126,10 @@ f_expr:
     LPAREN FUNC s_expr_list RPAREN {
         fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr_list RPAREN\n");
         $$ = createFunctionNode($2, $3);
+    }
+    | LPAREN SYMBOL s_expr_list RPAREN{
+    fprintf(stderr, "yacc: f_expr ::= LPAREN FUNC s_expr_list RPAREN\n");
+            $$ = createFunctionNode($2, $3);
     };
 
 s_expr_list:

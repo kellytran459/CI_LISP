@@ -473,7 +473,7 @@ RET_VAL divide(AST_NODE *funcNode)
 
     if(result.value == 0)
     {
-        printf("WARNING: Cannot divide by 0");
+        printf("WARNING: Cannot divide by 0\n");
         return (RET_VAL){INT_TYPE, NAN};
     }
 
@@ -617,10 +617,6 @@ RET_VAL print (AST_NODE *func)
 
 RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode)
 {
-//    if (!funcNode)
-//        return (RET_VAL){INT_TYPE, NAN};
-
-  //  RET_VAL result = {INT_TYPE, 0};
 
     // TODO populate result with the result of running the function on its operands.  Might need to further adjust
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
@@ -682,7 +678,6 @@ SYMBOL_TABLE_NODE *findSymbolTableNode(char *ident, AST_NODE *ast_Node) {
 
 RET_VAL evalSymType (SYMBOL_TABLE_NODE * node, RET_VAL val)
 {
-   // RET_VAL symbol = eval(node->val);
     if(node->val_type == INT_TYPE && val.type == DOUBLE_TYPE)
     {
         printf("WARNING: precision loss in the assignment for variable %s\n", node->ident);
@@ -692,7 +687,6 @@ RET_VAL evalSymType (SYMBOL_TABLE_NODE * node, RET_VAL val)
     }
     if(node->val_type == DOUBLE_TYPE && val.type == INT_TYPE)
     {
-        //  printf("No precision loss, add .0 to make it a double\n");
         return (RET_VAL){DOUBLE_TYPE, (val.value)};
     }
     return val;
@@ -708,7 +702,6 @@ RET_VAL evalSymNode(AST_NODE *symNode)
     RET_VAL result = {INT_TYPE, NAN};
 
     SYMBOL_TABLE_NODE *node = findSymbolTableNode(symNode->data.symbol.ident, symNode);
-    // eval the value fo node and return
     if (node != NULL)
         return evalSymType(node, eval(node->val));
 
